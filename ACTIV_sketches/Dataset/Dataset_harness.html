@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<!-- TODO: Asynchronous loading of DataFrame class is causing some issues -->
+<!--
+   List of possible logins (and number of records for each)
+
+	numRecords	Grower
+	   9	VIGUIE FARMS
+	  15	G.G. Orchards
+	  18	RRS Farms (Fresno)
+	  33	Del Carlo Farms Inc
+	  38	B. YAMAMOTO FARMS
+	  47	THOMSEN FARMS, INC.
+	  49	Amistad Ranches
+	  51	Jason Bryson
+	  59	HOULDING FARMS # 4, INC.
+	  62	V&A Lagorio
+	  62	GRAHAM FAMILY FARMING
+	  75	Y & L FARMS
+	  76	RIVER PRIDE FARMS INC.
+	  87	Dustin Timothy Farming
+	  90	Y. AOKI, Inc.
+	  93	DOUG CHAN
+	 112	SILVERDALE FARMS
+	 113	Barrios Bros Inc
+	 123	PEREZ FARMS - WESTLEY
+	 130	TRIPLE SANGUINETTI FARMS, INC
+	 159	Worth Farms
+	 193	LAGRANDE FARMS
+	 194	RICHTER BROS. INC.
+	 209	T & P FARMS
+	 220	Liberty Trust
+	 229	TSUTSUI ENTERPRISES
+	 241	F.A. MAGGIORE & SONS
+	 281	BULLSEYE
+	 289	JIM BORCHARD FARMING
+	 293	MARCHINI FARMS
+	 295	JOE YEUNG FARMS, INC.
+	 303	K & D Aoki
+	 305	VIGUIE FARMING
+	 308	ROMINGER BROS. FARMS
+	 314	CERRI FARMS, INC.
+	 323	M & F FARMS
+	 341	RRS FARMS (BW)
+	 364	SIMONI & MASSONI FARMS
+	 375	GEORGE AOKI FARMS, INC.
+	 377	RONALD TIMOTHY FARMING
+	 381	BUTTON & TURKOVICH
+	 387	TANAKA FARMS, INC.
+	 425	SCHREINER FARMS
+	 434	BARRIOS FARMS, INC.
+	 447	D.A. ROMINGER & SONS
+	 478	DOUGHERTY BROS.
+	 481	COOLEY ENTERPRISES, INC
+	 546	REVEILLE FARMS
+	 647	J.H. MEEK & SONS, INC.
+	 873	HARLAN FAMILY RANCH
+	1042	E & H FARMS
+-->
+
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<!-- CSS for Modal Login page -->
+	<style>
+		body {font-family: Arial, Helvetica, sans-serif;}
+
+		/* Full-width input fields */
+		input[type=password] {
+			width: 100%;
+			padding: 12px 20px;
+			margin: 8px 0;
+			display: inline-block;
+			border: 1px solid #ccc;
+			box-sizing: border-box;
+		}
+
+		/* Set a style for all buttons */
+		button {
+			background-color: #4CAF50;
+			color: white;
+			padding: 14px 20px;
+			margin: 8px 0;
+			border: none;
+			cursor: pointer;
+			width: 100%;
+		}
+
+		button:hover {
+			opacity: 0.8;
+		}
+
+		/* Extra styles for the cancel button */
+		.cancelbtn {
+			width: auto;
+			padding: 10px 18px;
+			background-color: #f44336;
+		}
+
+		/* Center the image and position the close button */
+		.imgcontainer {
+			text-align: center;
+			margin: 24px 0 12px 0;
+			position: relative;
+		}
+
+		img.avatar {
+			width: 40%;
+			border-radius: 50%;
+		}
+
+		.container {
+			padding: 16px;
+		}
+
+		span.psw {
+			float: right;
+			padding-top: 16px;
+		}
+
+		/* The Modal (background) */
+		.modal {
+			display: none; /* Hidden by default */
+			position: fixed; /* Stay in place */
+			z-index: 1; /* Sit on top */
+			left: 0;
+			top: 0;
+			width: 100%; /* Full width */
+			height: 100%; /* Full height */
+			overflow: auto; /* Enable scroll if needed */
+			background-color: rgb(0,0,0); /* Fallback color */
+			background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+			padding-top: 60px;
+		}
+
+		/* Modal Content/Box */
+		.modal-content {
+			background-color: #fefefe;
+			margin: 0% auto 20% auto; /* 5% from the top, 15% from the bottom and centered */
+			border: 1px solid #888;
+			width: 70%; /* Could be more or less, depending on screen size */
+		}
+
+		/* The Close Button (x) */
+		.close {
+			position: absolute;
+			right: 25px;
+			top: 0;
+			color: #000;
+			font-size: 35px;
+			font-weight: bold;
+		}
+
+		.close:hover,
+		.close:focus {
+			color: red;
+			cursor: pointer;
+		}
+
+		/* Add Zoom Animation */
+		.animate {
+			-webkit-animation: animatezoom 0.6s;
+			animation: animatezoom 0.6s
+		}
+
+		@-webkit-keyframes animatezoom {
+			from {-webkit-transform: scale(0)} 
+			to {-webkit-transform: scale(1)}
+		}
+			
+		@keyframes animatezoom {
+			from {transform: scale(0)} 
+			to {transform: scale(1)}
+		}
+
+		/* Change styles for span and cancel button on extra small screens */
+		@media screen and (max-width: 300px) {
+			span.psw {
+			   display: block;
+			   float: none;
+			}
+			.cancelbtn {
+			   width: 100%;
+			}
+		}
+	</style>
+
+	<!-- Pull in D3 -->
+	<script src="https://d3js.org/d3.v3.min.js"></script>
+
+	<!-- Pull in jquery -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+	<!-- Pull in Datatables API -->
+	<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.18/css/jquery.dataTables.min.css"/>
+	<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.5.4/css/buttons.dataTables.min.css"/>
+	<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/colreorder/1.5.0/css/colReorder.dataTables.min.css"/>
+	<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/fixedcolumns/3.2.5/css/fixedColumns.dataTables.min.css"/>
+	<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/fixedheader/3.1.4/css/fixedHeader.dataTables.min.css"/>
+	<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.2.2/css/responsive.dataTables.min.css"/>
+	<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/rowgroup/1.1.0/css/rowGroup.dataTables.min.css"/>
+	<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/rowreorder/1.2.4/css/rowReorder.dataTables.min.css"/>
+	<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/scroller/1.5.0/css/scroller.dataTables.min.css"/>
+	<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/select/1.2.6/css/select.dataTables.min.css"/>
+	 
+	<script type="text/javascript" src="https://cdn.datatables.net/1.10.18/js/jquery.dataTables.min.js"></script>
+	<script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.4/js/dataTables.buttons.min.js"></script>
+	<script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.4/js/buttons.colVis.min.js"></script>
+	<script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.4/js/buttons.print.min.js"></script>
+	<script type="text/javascript" src="https://cdn.datatables.net/colreorder/1.5.0/js/dataTables.colReorder.min.js"></script>
+	<script type="text/javascript" src="https://cdn.datatables.net/fixedcolumns/3.2.5/js/dataTables.fixedColumns.min.js"></script>
+	<script type="text/javascript" src="https://cdn.datatables.net/fixedheader/3.1.4/js/dataTables.fixedHeader.min.js"></script>
+	<script type="text/javascript" src="https://cdn.datatables.net/responsive/2.2.2/js/dataTables.responsive.min.js"></script>
+	<script type="text/javascript" src="https://cdn.datatables.net/rowgroup/1.1.0/js/dataTables.rowGroup.min.js"></script>
+	<script type="text/javascript" src="https://cdn.datatables.net/rowreorder/1.2.4/js/dataTables.rowReorder.min.js"></script>
+	<script type="text/javascript" src="https://cdn.datatables.net/scroller/1.5.0/js/dataTables.scroller.min.js"></script>
+	<script type="text/javascript" src="https://cdn.datatables.net/select/1.2.6/js/dataTables.select.min.js"></script>
+
+	<!-- Pull in Dataset.js -->
+	<script src="./Dataset.js" ></script>
+</head>
+<body>
+
+
+<!-- This script block is the core of the demo -->
+<script >
+
+// Define a sleep function that we can use to wait when we need to wait ..
+function sleep(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
+
+// Initialize some variables, constants etc
+ 
+// Declare the three datasets that we will be using
+/** @type {DataFrame} ensembleDataset has all of the normative data that was used to generate a regression model etc. */
+var ensembleDataset;
+/** @type {DataFrame} myDataset has all that portion of the normative data that is "owned" by the current user */
+var myDataset;
+/** @type {DataFrame} analyzingDataset has that filtered subset of myDataset that is being used in the current analysis */
+var analyzingDataset;
+/** @type {String} userID the login name for the current user */
+var userID = "";
+
+/** @type {String} formatCount is a const that is used to format counts in the histogram as integers */
+const formatCount = d3.format(",.0f");
+
+/** @type {String} demoDataURL is a string constant that references a CSV Data Source named "C1_Super_Data_Frame - Nulls Converted to 0s.csv" */
+const demoDataURL = 'https://raw.githubusercontent.com/AthenaIntelligence/conditionalprofile/master/idea_sketches/TensorFlow%20stuff/C1_Super_Data_Frame%20-%20Nulls%20Converted%20to%200s.csv?token=AA_UzkIIBR5nnk3uaBSpUlCuIP-iMJ7qks5b6hiJwA%3D%3D';
+
+/**
+ * @type {object} dataSetDescription describes the columns of the dataset that is used for the demo
+ * the descriptions include flags that inform whether the field is displayable, usable for topological mapping etc.
+ * Note that this object does give an initial idea of the properties that are needed to implement the ACTIV design.
+*/
+var dataSetDescription={
+	Grower:{isResult:0,isFactor:1,editable:0,display:1,isTypological:0,mapped:0,display_name:"Grower"},
+	Field:{isResult:0,isFactor:1,editable:0,display:1,isTypological:0,mapped:0,display_name:"Field"},
+	County:{isResult:0,isFactor:1,editable:0,display:1,isTypological:0,mapped:0,display_name:"County"},
+	Variety:{isResult:0,isFactor:1,editable:1,display:1,isTypological:0,mapped:1,display_name:"Variety"},
+	ET_used_for_irr_schedule:{isResult:0,isFactor:1,editable:1,display:1,isTypological:0,mapped:1,display_name:"ET used for irr schedule"},
+	Irrigation_source:{isResult:0,isFactor:1,editable:0,display:1,isTypological:0,mapped:0,display_name:"Irrigation source"},
+	Primary_irrigation_system_type:{isResult:0,isFactor:1,editable:1,display:1,isTypological:0,mapped:1,display_name:"Primary irrigation system type"},
+	Soil_moisture_sensors_used_for_scheduling:{isResult:0,isFactor:1,editable:0,display:1,isTypological:0,mapped:0,display_name:"Soil moisture sensors used for scheduling"},
+	Intended_Use:{isResult:0,isFactor:1,editable:0,display:1,isTypological:0,mapped:1,display_name:"Intended Use"},
+	Calculated_Planting_Date:{isResult:0,isFactor:1,editable:0,display:1,isTypological:0,mapped:0,display_name:"Calculated Planting Date"},
+	Harvest_Date:{isResult:0,isFactor:1,editable:0,display:1,isTypological:0,mapped:0,display_name:"Harvest Date"},
+	Grower_avg_solids:{isResult:0,isFactor:1,editable:0,display:0,isTypological:1,mapped:0,display_name:"Grower avg solids"},
+	Grower_num_samples:{isResult:0,isFactor:1,editable:0,display:0,isTypological:1,mapped:0,display_name:"Grower num samples"},
+	Variety_avg_solids:{isResult:0,isFactor:1,editable:0,display:0,isTypological:1,mapped:0,display_name:"Variety avg solids"},
+	Variety_num_samples:{isResult:0,isFactor:1,editable:0,display:0,isTypological:1,mapped:0,display_name:"Variety num samples"},
+	ET_used_for_irr_schedule_avg_solids:{isResult:0,isFactor:1,editable:0,display:0,isTypological:1,mapped:0,display_name:"ET used for irr schedule avg solids"},
+	ET_used_for_irr_schedule_num_samples:{isResult:0,isFactor:1,editable:0,display:0,isTypological:1,mapped:0,display_name:"ET used for irr schedule num samples"},
+	Primary_irrigation_system_type_avg_solids:{isResult:0,isFactor:1,editable:0,display:0,isTypological:1,mapped:0,display_name:"Primary irrigation system type avg solids"},
+	Primary_irrigation_system_type_num_samples:{isResult:0,isFactor:1,editable:0,display:0,isTypological:1,mapped:0,display_name:"Primary irrigation system type num samples"},
+	Intended_Use_avg_solids:{isResult:0,isFactor:1,editable:0,display:0,isTypological:1,mapped:0,display_name:"Intended Use avg solids"},
+	Intended_Use_num_samples:{isResult:0,isFactor:1,editable:0,display:0,isTypological:1,mapped:0,display_name:"Intended Use num samples"},
+	Year:{isResult:0,isFactor:1,editable:1,display:1,isTypological:0,mapped:0,display_name:"Year"},
+	Calculated_Planting_Day:{isResult:0,isFactor:1,editable:1,display:1,isTypological:0,mapped:0,display_name:"Calculated Planting Day"},
+	Harvest_Day:{isResult:0,isFactor:1,editable:1,display:1,isTypological:0,mapped:0,display_name:"Harvest Day"},
+	Avg__Irrigation_applied:{isResult:0,isFactor:1,editable:1,display:1,isTypological:0,mapped:0,display_name:"Avg Irrigation applied"},
+	Total_K_applied:{isResult:0,isFactor:1,editable:1,display:1,isTypological:0,mapped:0,display_name:"Total K applied"},
+	Total_N_applied:{isResult:0,isFactor:1,editable:1,display:1,isTypological:0,mapped:0,display_name:"Total N applied"},
+	Total_P_applied:{isResult:0,isFactor:1,editable:1,display:1,isTypological:0,mapped:0,display_name:"Total P applied"},
+	min_3ft_Water_Capacity:{isResult:0,isFactor:1,editable:0,display:1,isTypological:1,mapped:0,display_name:"min 3ft Water Capacity"},
+	max_3ft_Water_Capacity:{isResult:0,isFactor:1,editable:0,display:1,isTypological:1,mapped:0,display_name:"max 3ft Water Capacity"},
+	avg_3ft_Water_Capacity:{isResult:0,isFactor:1,editable:0,display:1,isTypological:1,mapped:0,display_name:"avg 3ft Water Capacity"},
+	min_Compaction__:{isResult:0,isFactor:1,editable:0,display:1,isTypological:1,mapped:0,display_name:"min Compaction "},
+	max_Compaction__:{isResult:0,isFactor:1,editable:0,display:1,isTypological:1,mapped:0,display_name:"max Compaction "},
+	avg_Compaction__:{isResult:0,isFactor:1,editable:0,display:1,isTypological:1,mapped:0,display_name:"avg Compaction "},
+	min_Depth_in_:{isResult:0,isFactor:1,editable:0,display:1,isTypological:1,mapped:0,display_name:"min Depth in "},
+	max_Depth_in_:{isResult:0,isFactor:1,editable:0,display:1,isTypological:1,mapped:0,display_name:"max Depth in "},
+	avg_Depth_in_:{isResult:0,isFactor:1,editable:0,display:1,isTypological:1,mapped:0,display_name:"avg Depth in "},
+	min_Clay__:{isResult:0,isFactor:1,editable:0,display:1,isTypological:1,mapped:0,display_name:"min Clay "},
+	max_Clay__:{isResult:0,isFactor:1,editable:0,display:1,isTypological:1,mapped:0,display_name:"max Clay "},
+	avg_Clay__:{isResult:0,isFactor:1,editable:0,display:1,isTypological:1,mapped:0,display_name:"avg Clay "},
+	min_Sand__:{isResult:0,isFactor:1,editable:0,display:1,isTypological:1,mapped:0,display_name:"min Sand "},
+	max_Sand__:{isResult:0,isFactor:1,editable:0,display:1,isTypological:1,mapped:0,display_name:"max Sand "},
+	avg_Sand__:{isResult:0,isFactor:1,editable:0,display:1,isTypological:1,mapped:0,display_name:"avg Sand "},
+	min_OM__:{isResult:0,isFactor:1,editable:0,display:1,isTypological:1,mapped:0,display_name:"min OM "},
+	max_OM__:{isResult:0,isFactor:1,editable:0,display:1,isTypological:1,mapped:0,display_name:"max OM "},
+	avg_OM__:{isResult:0,isFactor:1,editable:0,display:1,isTypological:1,mapped:0,display_name:"avg OM "},
+	min_ph:{isResult:0,isFactor:1,editable:0,display:1,isTypological:1,mapped:0,display_name:"min ph"},
+	max_ph:{isResult:0,isFactor:1,editable:0,display:1,isTypological:1,mapped:0,display_name:"max ph"},
+	avg_ph:{isResult:0,isFactor:1,editable:0,display:1,isTypological:1,mapped:0,display_name:"avg ph"},
+	min_Drainage_Class_val:{isResult:0,isFactor:1,editable:0,display:1,isTypological:1,mapped:0,display_name:"min Drainage Class val"},
+	max_Drainage_Class_val:{isResult:0,isFactor:1,editable:0,display:1,isTypological:1,mapped:0,display_name:"max Drainage Class val"},
+	avg_Drainage_Class_val:{isResult:0,isFactor:1,editable:0,display:1,isTypological:1,mapped:0,display_name:"avg Drainage Class val"},
+	min_Run_Off_val:{isResult:0,isFactor:1,editable:0,display:1,isTypological:1,mapped:0,display_name:"min Run Off val"},
+	max_Run_Off_val:{isResult:0,isFactor:1,editable:0,display:1,isTypological:1,mapped:0,display_name:"max Run Off val"},
+	avg_Run_Off_val:{isResult:0,isFactor:1,editable:0,display:1,isTypological:1,mapped:0,display_name:"avg Run Off val"},
+	Size:{isResult:0,isFactor:1,editable:0,display:1,isTypological:1,mapped:0,display_name:"Size"},
+	Longitude:{isResult:0,isFactor:1,editable:0,display:1,isTypological:1,mapped:0,display_name:"Longitude"},
+	Latitude:{isResult:0,isFactor:1,editable:0,display:1,isTypological:1,mapped:0,display_name:"Latitude"},
+	Avg__Harvested_Yield_Per_Acre:{isResult:1,isFactor:0,editable:0,display:1,isTypological:0,mapped:0,display_name:"Avg Harvested Yield Per Acre"},
+	Total_Grower_Value:{isResult:1,isFactor:0,editable:0,display:1,isTypological:0,mapped:0,display_name:"Total Grower Value"},
+	Avg__Slds:{isResult:1,isFactor:0,editable:0,display:1,isTypological:0,mapped:0,display_name:"Avg Slds"},
+	Net__tons_:{isResult:1,isFactor:0,editable:0,display:1,isTypological:0,mapped:0,display_name:"Net tons"},
+	// the __id__ column is special .. it's not part of the data, but rather a hash code that is generated in order to allow each record to be uniquely identifiable
+	__id__:{isResult:0,isFactor:0,editable:0,display:1,isTypological:0,mapped:0,display_name:"id"}
+}
+
+/** @type {object} factorMap is a nested structure that is used for data-driven mapping of discrete data (e.g. tomato Variety) to corresponding floating point values for a numeric model */
+const factor_map = 
+	{
+		Variety:{
+			'AB 0306':{Variety_avg_solids:5.74285714266667, Variety_num_samples:3},
+			'BHN BP 13':{Variety_avg_solids:4.747006001375, Variety_num_samples:16},
+			'BHN BP 16':{Variety_avg_solids:5.38141025646154, Variety_num_samples:13},
+			'BHN SEED BP 25':{Variety_avg_solids:4.90001831507692, Variety_num_samples:13},
+			'BHN SEED BP 26':{Variety_avg_solids:5.133333333, Variety_num_samples:1},
+			'BHN SEED BP 28':{Variety_avg_solids:5.1, Variety_num_samples:1},
+			'BHN SEEDS BP 2':{Variety_avg_solids:4.82638429997561, Variety_num_samples:41},
+			'CAMPBELL C 316':{Variety_avg_solids:5.25, Variety_num_samples:1},
+			'CAMPBELL CTAN 2005':{Variety_avg_solids:4.709677419, Variety_num_samples:1},
+			'CAMPBELL CXD 109  SHASTA':{Variety_avg_solids:5.35875554842136, Variety_num_samples:693},
+			'CAMPBELL CXD 179':{Variety_avg_solids:5.43452384914286, Variety_num_samples:21},
+			'CAMPBELL CXD 255':{Variety_avg_solids:5.19197222023058, Variety_num_samples:1249},
+			'CAMPBELL CXD 282':{Variety_avg_solids:5.13164282274348, Variety_num_samples:230},
+			'CAMPBELL CYEL 2009':{Variety_avg_solids:5.0864091514, Variety_num_samples:10},
+			'EXP MISC':{Variety_avg_solids:5.49375, Variety_num_samples:4},
+			'HARRIS MORAN C 322':{Variety_avg_solids:5.00822049964286, Variety_num_samples:14},
+			'HARRIS MORAN HM 7883':{Variety_avg_solids:4.905499465875, Variety_num_samples:16},
+			'HARRIS MORAN HMX 3884':{Variety_avg_solids:5.63408245574074, Variety_num_samples:27},
+			'HARRIS MORAN HMX 3887':{Variety_avg_solids:5.37151779845622, Variety_num_samples:434},
+			'HARRIS MORAN HMX 3888':{Variety_avg_solids:5.50491988403147, Variety_num_samples:286},
+			'HARRIS MORAN HMX 4884':{Variety_avg_solids:5.2833333335, Variety_num_samples:2},
+			'HARRIS MORAN HMX 4885':{Variety_avg_solids:5.14435365723347, Variety_num_samples:257},
+			'HARRIS MORAN HMX 4886':{Variety_avg_solids:5.98224941727273, Variety_num_samples:11},
+			'HARRIS MORAN HMX 4887':{Variety_avg_solids:5.68031746033333, Variety_num_samples:3},
+			'HARRIS MORAN HMX 4895':{Variety_avg_solids:5.10625, Variety_num_samples:4},
+			'HARRIS MORAN HMX 4907':{Variety_avg_solids:5.31333333333333, Variety_num_samples:3},
+			'HARRIS MORAN HMX 4909':{Variety_avg_solids:5.71482420216463, Variety_num_samples:164},
+			'HARRIS MORAN HMX 5235':{Variety_avg_solids:5.601, Variety_num_samples:10},
+			'HARRIS MORAN HMX 58801':{Variety_avg_solids:5.38461538461539, Variety_num_samples:13},
+			'HARRIS MORAN HMX 58811':{Variety_avg_solids:4.63126050414286, Variety_num_samples:7},
+			'HARRIS MORAN HMX 58841':{Variety_avg_solids:5.51217813048148, Variety_num_samples:27},
+			'HARRIS MORAN HMX 58871':{Variety_avg_solids:5.67798076925, Variety_num_samples:20},
+			'HARRIS MORAN HMX 5900':{Variety_avg_solids:5.56663071292174, Variety_num_samples:115},
+			'HARRIS-MORAN  HMX 8846':{Variety_avg_solids:5.8, Variety_num_samples:1},
+			'HARRIS-MORAN 9905':{Variety_avg_solids:5.12228588808842, Variety_num_samples:475},
+			'HARRIS-MORAN HMX 1892':{Variety_avg_solids:5.42915449253788, Variety_num_samples:132},
+			'HARRIS-MORAN HMX 1893':{Variety_avg_solids:5.10672095387179, Variety_num_samples:117},
+			'HARRIS-MORAN HMX 2897':{Variety_avg_solids:5.575, Variety_num_samples:2},
+			'HARRIS-MORAN HMX 2898':{Variety_avg_solids:6.3, Variety_num_samples:1},
+			'HARRIS-MORAN HMX 7885':{Variety_avg_solids:4.8, Variety_num_samples:3},
+			'HEINZ 1015':{Variety_avg_solids:5.30926382398065, Variety_num_samples:155},
+			'HEINZ 1161':{Variety_avg_solids:5.48311591127857, Variety_num_samples:140},
+			'HEINZ 1170':{Variety_avg_solids:5.2918506493, Variety_num_samples:10},
+			'HEINZ 1175':{Variety_avg_solids:4.77092902955556, Variety_num_samples:27},
+			'HEINZ 1285':{Variety_avg_solids:5.702609734, Variety_num_samples:16},
+			'HEINZ 1293':{Variety_avg_solids:6.4, Variety_num_samples:1},
+			'HEINZ 1296':{Variety_avg_solids:6.3, Variety_num_samples:1},
+			'HEINZ 1301':{Variety_avg_solids:5.3, Variety_num_samples:4},
+			'HEINZ 1304':{Variety_avg_solids:5.3698968252, Variety_num_samples:5},
+			'HEINZ 1308':{Variety_avg_solids:4.65, Variety_num_samples:2},
+			'HEINZ 1310':{Variety_avg_solids:5.28472709204396, Variety_num_samples:91},
+			'HEINZ 1311':{Variety_avg_solids:5.2, Variety_num_samples:1},
+			'HEINZ 2005':{Variety_avg_solids:5.1, Variety_num_samples:1},
+			'HEINZ 5508':{Variety_avg_solids:4.5747278938995, Variety_num_samples:398},
+			'HEINZ 5608':{Variety_avg_solids:4.85007353756785, Variety_num_samples:479},
+			'HEINZ 8504':{Variety_avg_solids:5.05613435944444, Variety_num_samples:27},
+			'HEINZ 9780':{Variety_avg_solids:5.66836563826829, Variety_num_samples:82},
+			'HEINZ H 1422':{Variety_avg_solids:5.7, Variety_num_samples:2},
+			'HEINZ H 1424':{Variety_avg_solids:6.0471818922381, Variety_num_samples:21},
+			'HEINZ H 1425':{Variety_avg_solids:5.275, Variety_num_samples:2},
+			'HEINZ H 1427':{Variety_avg_solids:5.0333333335, Variety_num_samples:2},
+			'HEINZ H 1428':{Variety_avg_solids:5.25, Variety_num_samples:1},
+			'HEINZ H 1539':{Variety_avg_solids:5.275, Variety_num_samples:1},
+			'HEINZ H 1659':{Variety_avg_solids:5.1, Variety_num_samples:1},
+			'HEINZ H 1662':{Variety_avg_solids:5.1866666666, Variety_num_samples:5},
+			'HEINZ H 5702':{Variety_avg_solids:5.066666667, Variety_num_samples:1},
+			'HEINZ TRIAL':{Variety_avg_solids:5.12824706695652, Variety_num_samples:23},
+			'MIX':{Variety_avg_solids:5.6325, Variety_num_samples:10},
+			'NUNHEMS 6394':{Variety_avg_solids:5.13046193667073, Variety_num_samples:82},
+			'NUNHEMS N 6397':{Variety_avg_solids:5.20034266743256, Variety_num_samples:608},
+			'NUNHEMS N 6402':{Variety_avg_solids:5.45462609962528, Variety_num_samples:443},
+			'NUNHEMS N 6404':{Variety_avg_solids:5.32572316950658, Variety_num_samples:608},
+			'NUNHEMS N 6407':{Variety_avg_solids:5.46104813612858, Variety_num_samples:350},
+			'NUNHEMS N 6410':{Variety_avg_solids:5.22632342079355, Variety_num_samples:155},
+			'NUNHEMS N 6412':{Variety_avg_solids:5.27008067384615, Variety_num_samples:52},
+			'NUNHEMS N 6415':{Variety_avg_solids:4.99801677204545, Variety_num_samples:22},
+			'NUNHEMS N 6416':{Variety_avg_solids:5.13128780070423, Variety_num_samples:213},
+			'NUNHEMS N 6420':{Variety_avg_solids:4.3726666668, Variety_num_samples:5},
+			'NUNHEMS N 6424':{Variety_avg_solids:5.08, Variety_num_samples:5},
+			'NUNHEMS N 6426':{Variety_avg_solids:5.0549922031, Variety_num_samples:20},
+			'NUNHEMS N 6428':{Variety_avg_solids:5.09110017151755, Variety_num_samples:114},
+			'NUNHEMS N 6429':{Variety_avg_solids:5.14418734042308, Variety_num_samples:26},
+			'NUNHEMS N 6431':{Variety_avg_solids:5.83333333333333, Variety_num_samples:3},
+			'ORSETTI 6111':{Variety_avg_solids:4.875, Variety_num_samples:1},
+			'ORSETTI BOS 602':{Variety_avg_solids:4.875, Variety_num_samples:2},
+			'PS 816':{Variety_avg_solids:4.56481185, Variety_num_samples:6},
+			'SEMINIS AB 0306':{Variety_avg_solids:5.98170564666666, Variety_num_samples:18},
+			'SEMINIS AB 0311 (Bad)':{Variety_avg_solids:5.62669890912816, Variety_num_samples:1069},
+			'SEMINIS AB 0311':{Variety_avg_solids:5.8284974010245, Variety_num_samples:1143},
+			'SEMINIS AB 2':{Variety_avg_solids:5.160842950875, Variety_num_samples:280},
+			'SEMINIS AB 3':{Variety_avg_solids:5.4615634815, Variety_num_samples:44},
+			'SEMINIS AB 4606':{Variety_avg_solids:5.5686431625, Variety_num_samples:8},
+			'SEMINIS APT 410':{Variety_avg_solids:5.11809746406516, Variety_num_samples:399},
+			'SEMINIS DRI 0320':{Variety_avg_solids:5.45213225078947, Variety_num_samples:209},
+			'SEMINIS DRI 0335':{Variety_avg_solids:5, Variety_num_samples:1},
+			'SEMINIS DRI 319':{Variety_avg_solids:5.68830869963205, Variety_num_samples:1897},
+			'SEMINIS HYPEEL 849':{Variety_avg_solids:5.05894930280162, Variety_num_samples:741},
+			'SEMINIS PS 002':{Variety_avg_solids:5.2192792208, Variety_num_samples:5},
+			'SEMINIS PX 0299':{Variety_avg_solids:5.91481481477778, Variety_num_samples:9},
+			'SEMINIS PX 650':{Variety_avg_solids:5.24646872255814, Variety_num_samples:43},
+			'SEMINIS SV 0599TM':{Variety_avg_solids:5.17282480474888, Variety_num_samples:223},
+			'SEMINIS SV 2493TM':{Variety_avg_solids:5.29492561312963, Variety_num_samples:54},
+			'SEMINIS SV 2756TM':{Variety_avg_solids:5.21424603171429, Variety_num_samples:14},
+			'SEMINIS SV 6133TM':{Variety_avg_solids:5.4535952381, Variety_num_samples:10},
+			'SEMINIS SV 8011TM':{Variety_avg_solids:5.57599659097468, Variety_num_samples:79},
+			'SEMINIS SV TM2303':{Variety_avg_solids:5.066666667, Variety_num_samples:1},
+			'SEMINIS SV TM5655':{Variety_avg_solids:5.08264705882353, Variety_num_samples:17},
+			'SEMINIS SV8232TM':{Variety_avg_solids:5.32608996362069, Variety_num_samples:29},
+			'SEMINIS SV8516TM':{Variety_avg_solids:5.58145833333333, Variety_num_samples:12},
+			'SOS IVF 5234':{Variety_avg_solids:5.57915565223464, Variety_num_samples:179},
+			'SUN 6287':{Variety_avg_solids:4.88536324783333, Variety_num_samples:6},
+			'SUN 6366':{Variety_avg_solids:5.59028838025184, Variety_num_samples:1489},
+			'SUN 6368':{Variety_avg_solids:5.02339969966667, Variety_num_samples:36},
+			'UNCODED':{Variety_avg_solids:5.03614718618182, Variety_num_samples:11},
+			'UNITED GENETICS UG 10109':{Variety_avg_solids:5.059920635, Variety_num_samples:6},
+			'UNITED GENETICS UG 16609':{Variety_avg_solids:5.46052937724551, Variety_num_samples:167},
+			'UNITED GENETICS UG 19006':{Variety_avg_solids:5.329239766, Variety_num_samples:6},
+			'UNITED GENETICS UG 19406':{Variety_avg_solids:5.40401854918711, Variety_num_samples:652},
+			'UNITED GENETICS UG 19910':{Variety_avg_solids:5.8045454545, Variety_num_samples:2},
+			'UNITED GENETICS UG 31305':{Variety_avg_solids:5.1, Variety_num_samples:1},
+			'UNITED GENETICS UG 9436':{Variety_avg_solids:5.706267745, Variety_num_samples:12},
+			'US AGRISEED P 10':{Variety_avg_solids:4.25, Variety_num_samples:1},
+			'US AGRISEED USAT 1181':{Variety_avg_solids:5.3424242425, Variety_num_samples:2},
+			'WOODBRIDGE BQ 129':{Variety_avg_solids:5.3, Variety_num_samples:1},
+			'WOODBRIDGE BQ 141':{Variety_avg_solids:4.93221895908065, Variety_num_samples:62},
+			'WOODBRIDGE BQ 142':{Variety_avg_solids:5.14194926866667, Variety_num_samples:39},
+			'WOODBRIDGE BQ 163':{Variety_avg_solids:5.56939249636667, Variety_num_samples:30},
+			'WOODBRIDGE BQ 205':{Variety_avg_solids:5.30677625550807, Variety_num_samples:124},
+			'WOODBRIDGE BQ 206':{Variety_avg_solids:5.38641609752323, Variety_num_samples:409},
+			'WOODBRIDGE BQ 257':{Variety_avg_solids:5.16, Variety_num_samples:1},
+			'WOODBRIDGE BQ 268':{Variety_avg_solids:5.376190476, Variety_num_samples:4},
+			'WOODBRIDGE BQ 273':{Variety_avg_solids:5.44291141801558, Variety_num_samples:321},
+			'WOODBRIDGE BQ 292':{Variety_avg_solids:4.5, Variety_num_samples:1},
+			'WOODBRIDGE BQ 296':{Variety_avg_solids:6.03905597321053, Variety_num_samples:19},
+			'WOODBRIDGE BQ 312':{Variety_avg_solids:5.38386621314286, Variety_num_samples:21},
+			'WOODBRIDGE BQ 328':{Variety_avg_solids:5.2, Variety_num_samples:1},
+			'WOODBRIDGE BQ 400':{Variety_avg_solids:5.42904970529851, Variety_num_samples:67},
+			'WOODBRIDGE BQ 402':{Variety_avg_solids:5.9, Variety_num_samples:1},
+			'WOODBRIDGE BQ 403':{Variety_avg_solids:5.5146459235, Variety_num_samples:20},
+			'WOODBRIDGE BQ 416':{Variety_avg_solids:5.533333333, Variety_num_samples:1}
+		},
+		ET_used_for_irr_schedule:{
+			'no':{ET_used_for_irr_schedule_avg_solids:5.46232181344496, ET_used_for_irr_schedule_num_samples:8057},
+			'yes':{ET_used_for_irr_schedule_avg_solids:5.29952642350775, ET_used_for_irr_schedule_num_samples:8465}
+		},
+		Primary_irrigation_system_type:{
+			'drip':{Primary_irrigation_system_type_avg_solids:5.27070588609488, Primary_irrigation_system_type_num_samples:8824},
+			'furrow':{Primary_irrigation_system_type_avg_solids:5.48920473218543, Primary_irrigation_system_type_num_samples:6704},
+			'sprinkler':{Primary_irrigation_system_type_avg_solids:5.599456932474, Primary_irrigation_system_type_num_samples:1000},
+		},
+		Intended_Use:{
+			'MPE':{Intended_Use_avg_solids:5.75459050813511, Intended_Use_num_samples:2531},
+			'Diced':{Intended_Use_avg_solids:5.24929245865905, Intended_Use_num_samples:2452},
+			'Paste':{Intended_Use_avg_solids:5.33733820119661, Intended_Use_num_samples:13737},
+		}
+	}
+	
+// updateStatus is used to give notices of what is going on
+function updateStatus(text){
+	console.log(text + " " + Date());
+}
+
+/**
+ * loadEnsembleData is used to load the ensemble dataset from a designated URL
+*/
+loadEnsembleData = async function(dataURL, fnCallback=undefined){ 
+
+	// Load a CSV into the ensembleDataSet
+	// We'll use await to block until it's available
+    console.log("loadEnsembleData: Loading from " + dataURL + " " + Date());
+    var promiseDF = DataFrame.fromCSV(dataURL).then( df => ensembleDataset = df);
+	await promiseDF;
+
+	// If we were given a callback function
+	// then call it.
+	// This callback is "what we do after having loaded the data"
+    console.log("loadEnsembleData: typeof(fnCallback)=" +  typeof(fnCallback));
+	if (typeof(fnCallback) === "function"){
+		fnCallback();
+	}
+}
+
+/**
+ * loadAfterLogin loads the ensembleDataset from a designated URL
+ * and then loads myDataset based on the loginID that the user provided
+*/
+function loadAfterLogin(){
+	// Get the userID from the login
+	userID = document.getElementsByName("uname")[0].value;
+
+	// do a weak test to see if useID has anything valid
+	// if it does, then call loac
+	if (userID != ""){
+	
+		// show whose data this is
+		updateStatus(userID + " logged in");
+		
+		// call loadEnsembleData
+		// since it is asynchronous, pass in newPlotHistogram as a call-back
+		// this will cause it to plot a histogram after the data is loaded.
+		loadEnsembleData(demoDataURL, afterNewEnsembleLoaded)
+	}
+}
+
+/**
+ * newPlotHistogram is a simplistic "continuation" of sorts.
+ * It is galled after loading new data in order to display a histogram based on thta data
+*/
+function afterNewEnsembleLoaded(){
+	// get entries in the dataset that correspond to the userID
+	// TODO: This ultimately needs to be more sophisticated
+    console.log("loadEnsembleData: Getting records for: " + userID + " " + Date());
+	
+	// Get rows for d in grower, and also tack on a unique id for the row, based on a hash of the row's contents
+	myDataset = ensembleDataset.where(row => row.get("Grower") == userID).withColumn('__id__',(row) => '#' + row.hash())
+
+	// initially put all records from the myDataset into the analyzingDataset	
+    // we will let the user filter down the myDataset later
+    console.log("loadEnsembleData: Setting up initial analysis dataset " + " " + Date());    
+	analyzingDataset = myDataset.where(row => (row.get('Grower') == userID));
+
+	// plot a histogram
+    console.log("loadEnsembleData: Plotting histogram for Avg__Slds " + " " + Date());
+    plotHistogram(ensembleDataset, 'Avg__Slds', '% Average Solids');
+	
+	// Draw the analysis grid for the analysis dataset
+	showAnalysisDataGrid();
+}
+
+/**
+ * getVisibleColumnNames gets the names of columns that have been declared as displayable in the dataframes
+*/
+function getDisplayableColumnNames(){
+	// displayableColumnNames will hold text values that will appear above columns
+	var displayableColumnNames=[];
+	
+	// display columns will be an array of objects that are used to tell inform the DataTable about columns in the table
+	var displayColumns=[];
+	
+	// Use the dataSetDescription array to build up the list of which columns are displayable
+	for(var propt in dataSetDescription){
+		// If a column is marked as displayable ...
+		if(dataSetDescription[propt].display == 1){
+			// make a column definition object that tells what to display for this column
+			var column_def;
+			column_def = {title: dataSetDescription[propt].display_name};
+			displayColumns.push(column_def);
+			
+			// add the actual column name for the column to the displayableColumnNames array
+			// this is used to tell which 
+			displayableColumnNames.push(propt);
+		}
+	}
+	return {displayColumns: displayColumns, displayableColumnNames, displayableColumnNames};
+}
+
+/**
+* showAnalysisDataGrid sets up display of the analysisDataset
+*/
+function showAnalysisDataGrid(){
+	// re-declare the table for the analysis grid
+	//  First, remove any existing instance
+	//  Then, create a new instance
+	$('#analysisGridDiv').empty();
+	$('#analysisGridDiv').append('<font size="1" face="Courier New" ><table id="analysisTable" class="cell-border compact stripe" width="100%"></table></font>');
+
+	/** @type {object} displayableColumnInfo has the members
+	 *  - displayableColumnNames, which is used to determine which columns we will need in the array that holds the grid data, and
+	 *  - displayColumns, which is used to tell the display names for the columns
+	*/
+	var displayableColumnInfo = getDisplayableColumnNames();
+	var displayData=analyzingDataset.select.apply(analyzingDataset, displayableColumnInfo.displayableColumnNames).toArray();
+ 
+	// draw the grid
+	$(document).ready(function() {
+
+		// set up the table itself
+		var table = $('#analysisTable').DataTable( {
+				data: displayData,
+				columns: displayableColumnInfo.displayColumns,
+				colReorder: true
+			} );
+			
+		// immediately hide the __id__ column (which is always the last columns)
+		table.column( -1 ).visible(false);
+		
+			
+		// add a footer to the table
+		$('#analysisTable').append('<tfoot><tr></tr></tfoot>"=');
+		
+		// for each header, add a matching <th> that contains an <input> in the footer
+		// the <input> is used for simple filtering terms
+		$('#analysisTable thead th').each( function (index) {
+			var title = $(this).text();
+			$('#analysisTable tfoot tr').append('<th><input type="text" style="font-size: 12px" placeholder="Search '+title+'" /></th>');
+		} );
+			
+	  
+		// Apply the filter
+		$("#analysisTable tfoot input").on( 'keyup change', function () {
+			table
+				.column( $(this).parent().index()+':visible' )
+				.search( this.value )
+				.draw();
+		} );
+	} );
+}
+
+
+/**
+ * plotHistogram is a routine to plot a simple histogram in the analysis pane
+ * It ordinarily acts on the Ensemble Data Set, and 
+ */
+function plotHistogram(df, columnToUse, dataLabel){
+	// Plot a histogram ..
+	var color = "steelblue";
+	
+	// Clear any histogram that is already there
+	d3.select("svg").remove()
+	
+	// get an array of float values for the selected column
+	// The odd syntax simultaneously slices out the column, and converts it to float, and then flattens the resulting array into a 1D vector
+	console.log("plotHistogram: Getting " + columnToUse + "as histogram data " + Date());
+	histogramData = df.select(columnToUse).map(row => row.set(columnToUse, parseFloat(row.get(columnToUse)))).toArray().reduce(function(prev, curr){ return prev.concat(curr);});	
+
+	// Make a histogram in D3
+	// Get some range information
+    histogramDataMin = Math.min.apply(Math, histogramData);
+	histogramDataMax = Math.max.apply(Math, histogramData);
+    // Figure out how many 0.1 bins there are .. basically the range is the lowest
+    histogramDataMin = parseInt(10*histogramDataMin)/10; // get lower bound, quantized by 1 decimal place
+    histogramDataMax = parseInt(10*histogramDataMax + 1)/10; // get upper bound, quantized by 1 decimal place  
+    histogramDataBins = 10*(histogramDataMax - histogramDataMin);
+
+
+	// Set up the field on which we'll plot ..
+ 	console.log("plotHistogram: setting up plot geometry " + Date());
+	padding = 100;
+	overallWidth = 1280;
+	overallHeight = 500;
+	margin = {top: 20, right: 30, bottom: 50, left: 30},
+		width = overallWidth - margin.left - margin.right,
+		height = overallHeight - margin.top - margin.bottom;
+	xScale = d3.scale.linear()
+		  .domain([histogramDataMin, histogramDataMax])
+		  .range([0, width]);
+
+	// Put the data into uniformly-spaced bins that correspond to increments of 0.1%
+	// TODO: This is ok for a hard-wired demo of the C1 Solids data, but it's not the way to go long-term
+	console.log("plotHistogram: putting data in histogram bins " + Date());
+	data = d3.layout.histogram()
+		.bins(xScale.ticks(histogramDataBins))
+		(histogramData);
+
+	// Find the min and max counts of the historam bins
+	console.log("plotHistogram: labeling etc " + Date());
+	yMax = d3.max(data, function(d){return d.length});
+	yMin = d3.min(data, function(d){return d.length});
+	colorScale = d3.scale.linear()
+				.domain([yMin, yMax])
+				.range([d3.rgb(color).brighter(), d3.rgb(color).darker()]);
+
+	// Set the y scale
+	yScale = d3.scale.linear()
+		.domain([0, yMax])
+		.range([height, 0]);
+
+	// draw the x axis
+	xAxis = d3.svg.axis()
+		.scale(xScale)
+		.orient("bottom");
+
+	// label the x axis
+	svg = d3.select("#analysisChartDiv").append("svg")
+		.attr("width", width + margin.left + margin.right)
+		.attr("height", height + margin.top + margin.bottom)
+		.append("g")
+		.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+	bar = svg.selectAll(".bar")
+		.data(data)
+		.enter().append("g")
+		.attr("class", "bar")
+		.attr("transform", function(d) { return "translate(" + xScale(d.x) + "," + yScale(d.y) + ")"; });
+
+	bar.append("rect")
+		.attr("x", 1)
+		.attr("width", (xScale(data[0].dx) - xScale(0)) - 1)
+		.attr("height", function(d) { return height - yScale(d.y); })
+		.attr("fill", function(d) { return colorScale(d.y) });
+
+	// Put counts at the top of the histogram bars
+	bar.append("text")
+		.attr("dy", ".75em")
+		.attr("y", -12)
+		.attr("x", (xScale(data[0].dx) - xScale(0)) / 2)
+		.attr("text-anchor", "middle")
+		.text(function(d) { return formatCount(d.y); });
+
+	svg.append("g")
+		.attr("class", "x axis")
+		.attr("transform", "translate(0," + height + ")")
+		.call(xAxis);
+
+	// Print what the x axis denotes
+	svg.append("text")
+		.attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
+		.attr("transform", "translate("+ (width/2) +","+ (overallHeight - 25)  +")")  // centre below axis
+		.text(dataLabel);
+
+	svg.append("text")
+		.attr("class", "y label")
+		.attr("text-anchor", "middle")
+		.attr("y", 0 ) // center at the left
+		.attr("x", -overallHeight/2)
+		.attr("dy", ".75em")
+		.attr("transform", "rotate(-90)")
+		.text("Counts");
+	
+		console.log("plotHistogram: done " + Date());
+	}
+
+function displayAnalysisPoints(){
+	
+}
+</script>
+<!-- Declare button to log in -->
+<button onclick="document.getElementById('modalLogin').style.display='block'" style="width:auto;">Login</button>
+<!-- Declare region to show plot -->
+<div id="analysisChartDiv"></div>
+<!-- Declare region to show grid -->
+<div id="analysisGridDiv"></div>
+
+</body>
+
+<!-- Dummy modal login page .. -->
+<div id="modalLogin" class="modal">
+  
+  <form class="modal-content animate" action="/action_page.php">
+    <div class="imgcontainer">
+      <span onclick="document.getElementById('modalLogin').style.display='none'" class="close" title="Close Modal">&times;</span>
+      <img src="./assets/Athena_Logo.png" alt="Avatar" >
+    </div>
+
+    <div class="container">
+      <label for="uname"><b>Username</b></label>
+      <input type="text" style="width:100%; padding: 12px 20px; margin: 8px 0; display: inline-block; border: 1px solid #ccc; box-sizing: border-box;" placeholder="Enter Username" name="uname" required>
+
+      <label for="psw"><b>Password</b></label>
+      <input type="password" placeholder="Enter Password" name="psw" required>
+        
+      <button type="button" onclick="document.getElementById('modalLogin').style.display='none'; loadAfterLogin()" >Login</button>
+      <label>
+        <input type="checkbox" checked="checked" name="remember"> Remember me
+      </label>
+    </div>
+
+    <div class="container" style="background-color:#f1f1f1">
+      <button type="button" onclick="document.getElementById('modalLogin').style.display='none'" class="cancelbtn">Cancel</button>
+      <span class="psw" >Forgot <a href="#" onclick="document.alert('Not implemented in demo')">password?</a></span>
+    </div>
+  </form>
+</div>
+
+<!-- Handler for Login dummy .. -->
+<script>
+// Get the modal
+var modal = document.getElementById('modalLogin');
+
+// When the user clicks anywhere outside of the modal, close it
+window.onclick = function(event) {
+    if (event.target == modal) {
+        modal.style.display = "none";
+    }
+}
+</script>
+
+</html>
