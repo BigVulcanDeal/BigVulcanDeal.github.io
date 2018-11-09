@@ -1,2 +1,2 @@
 # BigVulcanDeal.github.io
-web resources for testing Biorealize code etc.
+web resources for testing MachineSpeak LLC code etc.
