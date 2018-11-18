@@ -23,7 +23,7 @@ catch(e){
 // Wrap all declarations with a "sleep"
 // This allows the dependencies to be loaded and executed
 function sleep(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
-(async function(){ await sleep(100); 
+(async function(){ await sleep(200); 
 
 	// "Sacarify" some of the references to make them simpler
 	DataFrame = dfjs.DataFrame;
