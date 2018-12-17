@@ -255,7 +255,7 @@ const demoDataURL = 'https://bigvulcandeal.github.io/ACTIV_sketches/test_data/C1
  * Note that this object does give an initial idea of the properties that are needed to implement the ACTIV design.
 */
 var dataSetDescription={
-    //Select:{isResult:0,isFactor:0,editable:0,display:1,isTypological:0,mapped:0,display_name:""},
+    Select:{isResult:0,isFactor:0,editable:0,display:1,isTypological:0,mapped:0,display_name:"Select"},
 	Grower:{isResult:0,isFactor:1,editable:0,display:1,isTypological:0,mapped:0,display_name:"Grower"},
 	Field:{isResult:0,isFactor:1,editable:0,display:1,isTypological:0,mapped:0,display_name:"Field"},
 	County:{isResult:0,isFactor:1,editable:0,display:1,isTypological:0,mapped:0,display_name:"County"},
@@ -540,7 +540,12 @@ function afterNewEnsembleLoaded(){
     console.log("loadEnsembleData: Getting records for: " + userID + " " + Date());
 	
 	// Get rows for d in grower, and also tack on a unique id for the row, based on a hash of the row's contents
-	myDataset = ensembleDataset.where(row => row.get("Grower") == userID).withColumn('__id__',(row) => '#' + row.hash())
+	myDataset = ensembleDataset.where(row => row.get("Grower") == userID).withColumn('__id__',(row) => '#' + row.hash()).withColumn('Select', (row) => '');
+	
+	// Reorder the dataframe so that the Select column is the first column
+	myDatasetColumns = myDataset.listColumns();
+	myDatasetColumns.unshift(myDatasetColumns.pop());
+	myDataset.restructure(myDatasetColumns);
 
 	// initially put all records from the myDataset into the analyzingDataset	
     // we will let the user filter down the myDataset later
