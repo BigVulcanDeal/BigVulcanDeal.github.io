@@ -593,12 +593,12 @@
                 <xsd:enumeration value="Consumed"/>
                 <xsd:enumeration value="Produced"/>
                 <xsd:enumeration value="Consumable"/>
-                <xsd:enumeration value="Replaced Assetn"/>
-                <xsd:enumeration value="Replacement Asset"/>
+                <xsd:enumeration value="ReplacedAsset"/>
+                <xsd:enumeration value="ReplacementAsset"/>
                 <xsd:enumeration value="Sample"/>
-                <xsd:enumeration value="Resurned Sample"/>
+                <xsd:enumeration value="ReturnedSample"/>
                 <xsd:enumeration value="Carrier"/>
-                <xsd:enumeration value="Returned Carrier"/>
+                <xsd:enumeration value="ReturnedCarrier"/>
                 <xsd:enumeration value="Other"/>
             </xsd:restriction>
         </xsd:simpleContent>
